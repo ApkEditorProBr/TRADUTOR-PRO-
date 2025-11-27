@@ -32,7 +32,7 @@ Inclui:
 ### ✅ 3. Dicionário Personalizado  
 - Cada entrada: `"original" → "substituição"`  
 - Armazenado em `localStorage`  
-- Aplicação automática sobre todas as strings  
+- Aplicação manual sobre todas as strings  
 - Importar e exportar dicionário  
 - Case-sensitive inteligente (mantém maiúsculas)
 
