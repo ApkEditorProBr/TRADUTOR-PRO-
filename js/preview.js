@@ -65,6 +65,7 @@
 https://youtube.com/@brumarti-oficial6117
  * ---------------------------------------------------------------
  */
+ 
 (function () {
   const fileInput = document.getElementById("fileInput");
   const stringList = document.getElementById("stringList");
@@ -98,18 +99,18 @@ https://youtube.com/@brumarti-oficial6117
 function replaceSmart(html, original, edited) {
   if (!original.trim()) return html;
 
-  // normalizar espaços
+  //Normalizar espaços
   const normOriginal = original.replace(/\u00A0/g, " ").replace(/\s+/g, " ").trim();
 
-  // proteger regex
+  //Proteger regex
   const esc = normOriginal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-  // match APENAS quando não houver letras/números antes/depois
+  //Match apenas quando não houver letras/números antes/depois
   const regex = new RegExp(`(?<![\\w\\-])${esc}(?![\\w\\-])`, "gi");
 
   let replaced = html.replace(regex, edited);
 
-  // fallback para casos extremos
+  //Fallback para casos extremos
   if (replaced === html) {
     const fallback = new RegExp(esc, "gi");
     return html.replace(fallback, edited);
@@ -237,6 +238,7 @@ function syntaxHighlightXML(xml) {
   pointer-events: none !important;
   cursor: default !important;
 }
+
 /* Sintaxe html */
 .hl-comment { color: #777 !important; }
 .hl-tag { color: #f66 !important; }
@@ -273,6 +275,7 @@ function syntaxHighlightXML(xml) {
     let content = originalFileContent;
 
     const inputs = stringList.querySelectorAll("input[type='text']");
+//NOTA: as substituições são aplicadas usando replaceSmart() //Para arquivos HTML complexos, isso às vezes pode modificar o texto/atributos das tags de maneiras //Que quebram a renderização. Se você ainda vir uma pré-visualização distorcida, considere usar //Uma abordagem de substituição baseada em DOM (substituindo apenas nós de texto e atributos).
 inputs.forEach(input => {
   const original = input.dataset.original || "";
   const edited = input.value || "";
@@ -295,32 +298,32 @@ inputs.forEach(input => {
       return `<pre class="preview-base">${syntaxHighlightXML(escaped)}</pre>`;
     }
 
-    //HTML
-    if (isHTML) {
-      const escaped = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const highlighted = syntaxHighlightHTML(escaped);
+//HTML
+if (isHTML) {
+  const escaped = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const highlighted = syntaxHighlightHTML(escaped);
 
-      let sanitized = content
-        .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
-        .replace(/\son[a-zA-Z]+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, "")
-        .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "");
+  let sanitized = content
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/\son[a-zA-Z]+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, "")
+    .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "");
 
-      sanitized = sanitized.replace(/<a /gi, '<a class="link-disabled" ');
+  sanitized = sanitized.replace(/<a /gi, '<a class="link-disabled" ');
 
-      const safeSource = sanitized.replace(/<\/script>/gi, "<\\/script>");
+  const safeSource = sanitized.replace(/<\/script>/gi, "<\\/script>");
 
-      return `
-        <button id="toggleViewBtn" class="toggle-view-btn" aria-label="Alternar visualização código / página">Página</button>
+  return `
+    <button id="toggleViewBtn" class="toggle-view-btn" aria-label="Alternar visualização código / página">Página</button>
 
-        <div id="htmlCodeView" class="html-code-view">
-          <pre class="preview-base">${highlighted}</pre>
-        </div>
+    <div id="htmlCodeView" class="html-code-view">
+      <pre class="preview-base">${highlighted}</pre>
+    </div>
 
-        <iframe id="htmlPageView" class="html-page-view" sandbox="allow-same-origin"></iframe>
+    <iframe id="htmlPageView" class="html-page-view" sandbox="allow-same-origin"></iframe>
 
-        <script id="previewSource" type="text/plain" style="display:none">${safeSource}</script>
-      `;
-    }
+    <script id="previewSource" type="text/plain" style="display:none">${safeSource}</script>
+  `;
+}
 
     return content;
   }
@@ -375,7 +378,7 @@ sourceTag = doc.getElementById("previewSource");
 
           const iframeDoc = pageView.contentWindow.document;
           iframeDoc.open();
-          iframeDoc.write(sourceTag.innerHTML);
+          iframeDoc.write(sourceTag.textContent || sourceTag.innerHTML); //Mais seguro: use  para evitar a mistura acidental de HTML...
           iframeDoc.close();
 
           //Também injetar CSS na página carregada dentro do iframe (quando escrevemos source)
