@@ -1,0 +1,1130 @@
+/* ============================================================
+   📘 DOCUMENTAÇÃO DO ARQUIVO DE ESTILO (estilo.css)
+   ------------------------------------------------------------
+   Este arquivo contém toda a estilização do Tradutor Pro+
+   organizado em blocos lógicos para facilitar a manutenção,
+   expansão e depuração do projeto.
+
+    Estrutura geral:
+   -------------------
+   • VARIÁVEIS GLOBAIS
+   • UI da página
+   • Barra principal do topo
+   • Botões
+   • Cards e containers principais
+   • Filtro de strings
+   • Upload de arquivo
+   • Seleção / bloqueio
+   • Tela de carregamento + progresso
+   • Toast (notificações)
+   • Ícones SVG
+   • Painel de Log
+   • Modais (IA Key / Dicionário)
+   • Janela de pré-visualização
+   • Lista de strings traduzidas
+   • Retraduzir / Cadeado
+   • Barra de seleção de itens
+   • Media Queries (responsividade)
+
+    Objetivos deste CSS:
+   -----------------------
+   • Manter consistência visual em modo escuro
+   • Garantir UX fluida e clara no mobile e desktop
+   • Criar elementos visualmente destacados, porém leves
+   • Facilitar interação rápida com listas longas de strings
+   • Aumentar contraste e legibilidade em ambientes escuros
+
+     Convenções adotadas:
+   -----------------------
+   • Cores principais definidas via var(--nome)
+   • Layout com pads suaves (4–16px)
+   • Bordas arredondadas (6–14px)
+   • Sombras sutis para profundidade
+   • Animações leves, rápidas e com feedback visual
+   • Ícones SVG usando fill: currentColor
+   • Evitar dependência de libs externas (CSS puro)
+
+     Paleta de cores em variável (tema escuro):
+   ---------------------------------
+   • Fundo geral:        var(--bg)
+   • Cartões/caixas:     var(--bg-card)
+   • Texto normal:       var(--text)
+   • Texto fraco:        var(--text-muted)
+   • Acento (azul):      var(--accent)
+   • Bordas:             var(--border)
+   • Popup verde:        var(--popup)
+
+     Boas práticas no uso do CSS:
+   -------------------------------
+   • Nunca estilize IDs fora desta estrutura
+   • Componentes devem ser reaproveitáveis
+   • Preferir utilizar `var(--cor)` sempre
+   • Evitar inline-style no HTML
+   • Evitar !important (salvo em comportamento crítico)
+   • Comentários grandes separam módulos
+
+      Para desenvolvedores:
+   ------------------------
+   • Toda seção pode ser expandida, removida ou substituída
+   • Animations, modals e toasts usam z-index bem definidos
+   • Os componentes principais foram organizados
+     para evitar conflito entre painéis flutuantes
+     (preview, modal, log, toast, loading)
+   • Todos os campos de texto usam layout responsivo
+   • A pré-visualização usa calc(100dvh) para mobile moderno
+
+      Responsividade:
+   ------------------
+   • Mobile-first
+   • Ajustes no topo e inputs < 600px
+   • Áreas de log e modal se reorganizam automaticamente
+
+      Última revisão:
+   ------------------
+   • Remoção de estilos duplicados
+   • Correção da propriedade de valor inválido “border: 1px solid gol”
+   • Ajuste de hover em campos e botões
+   • Padronização de sombras internas
+
+   ------------------------------------------------------------
+ *  Autor:
+
+**BruMarti – YouTube**  
+https://youtube.com/@brumarti-oficial6117
+============================================================ */
+:root {
+  --bg: #0f1116;
+  --bg-card: #1D2228;
+  --text: #e0e0e0;
+  --text-muted: #9aa0aa;
+  --accent: #00aaff;
+  --border: #262B31;
+  --popup: rgb(0,55,0,0.9);
+  --cursor: linear-gradient(135deg,
+    hsl(0, 100%, 68%),
+    hsl(0, 69%, 50%));
+}
+
+/* ======= UI PÁGINA ======= */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  user-select: none;
+  cursor: none;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+
+button, input, select {
+  font-family: inherit;
+  font-size: 15px;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+h1 {
+  font-size: 20px;
+}
+
+/* ======= BARRA PRINCIPAL TOPO ======= */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.top-actions input[type="file"] {
+  display: none;
+}
+
+select,
+input[type="search"] {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 8px;
+  transition: 0.2s;
+  outline: none;
+  box-shadow: none;
+}
+
+select:hover,
+input[type="search"]:hover {
+  border-color: var(--text-muted);
+}
+
+/* ======= BOTÕES ======= */
+button {
+  font-weight: 500;
+  background: transparent;
+  color: #fff;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: background 0.25s ease;
+}
+
+button.ghost {
+  font-weight: 500;
+  font-size: 13px;
+  text-align: center;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+button.ghost:hover {
+  background: var(--bg-card);
+  color: #fff;
+}
+
+button.ghost.active,
+#translateBtn.active {
+  background: var(--cursor) !important;
+}
+
+/* ======= UI PRINCIPAL ======= */
+.page {
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ======= FILTRAR STRINGS======= */
+#searchInput {
+  border-radius: 20px;
+  height: 35px;
+  outline: none;
+  box-shadow: none;
+  background: rgba(255,255,255,0.02);
+  border: none;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5),
+  inset -2px -2px 6px rgba(255,255,255,0.05); 
+}
+
+#searchInput:hover {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid none;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.5),
+  inset -2px -2px 6px rgba(255,255,255,0.05); 
+}
+
+/* ======= BTN CARREGR ARQUIVO ======= */
+.file-upload {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-btn {
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 10px 18px;
+  user-select: none;
+  border: none;
+  background: #272A33;
+  color: white;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.file-btn:active {
+  background: var(--cursor);
+}
+
+.file-name {
+  flex: 1;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--file-text);
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+/* ======= BLOQUEAR / DESBLOQUEAR ======= */
+#selectionSummary button {
+    height: clamp(28px, 4vw, 36px);
+    background: #474A4F;
+    border: none;
+    color: white;
+    padding: clamp(6px, 1.3vw, 10px) clamp(14px, 3.5vw, 24px);
+    border-radius: 10px;
+    letter-spacing: 0.2px;
+    transition: 0.25s;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    cursor: none;
+    user-select: none;
+}
+
+#selectionSummary button:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+#selectionSummary button:active {
+    transform: scale(0.96);
+    filter: brightness(0.93);
+}
+/* ======= TELA DE CARREGAMENTO ======= */
+#loadingScreen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  transition: opacity 0.3s ease;
+}
+
+#loadingScreen.active {
+  display: flex;
+  opacity: 1;
+}
+
+#loadingBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+}
+
+#loadingSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+#loadingProgress {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  margin-top: 8px;
+  text-shadow: 0 0 6px rgba(0,0,0,0.4);
+  transition: opacity 0.3s ease;
+}
+
+#loadingText {
+  color: white;
+  font-weight: 600;
+}
+
+/* ======= PORCENTAGEM 0%~100% ======= */
+@keyframes spin {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+
+#headerProgress {
+    background: linear-gradient(135deg, #4a9cff, #1b6dff);
+    color: white;
+}
+
+.header-progress {
+  background: linear-gradient(
+    135deg,
+    #00AAFE,
+  );
+
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  margin-left: 10px;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
+.header-progress:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.45),
+    inset 0 2px 3px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.header-progress.show {
+  opacity: 1;
+}
+
+.header-progress.hide {
+  opacity: 0;
+}
+
+/* ================================
+   ✅ TOAST
+================================ */
+.toast-success {
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--popup, #4caf50);
+  color: white;
+  text-align: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: all 0.4s ease;
+  z-index: 200;
+}
+
+.toast-success.show {
+  top: 24px;
+  opacity: 1;
+}
+
+/* ======= ÍCONES SVG======= */
+.icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  vertical-align: middle;
+  transition: transform 0.2s ease;
+}
+
+#themeToggle:hover .icon {
+  transform: rotate(15deg);
+}
+
+.retryBtn:hover .icon {
+  transform: rotate(-360deg);
+}
+
+.locked .icon {
+  fill: #f87171;
+}
+
+/* ======= LOG ======= */
+#logPanel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  width: 85%;
+  max-width: 700px;
+  max-height: 70vh;
+  background: var(--bg);
+  border: none;
+  border-radius: 10px; 
+  padding: 16px;
+  box-shadow: 0 0 0.9px white; 
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 10001;
+}
+
+#logPanel.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+#logOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+  z-index: 10000;
+}
+
+#logOverlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+#logContent {
+  height: 35vh;
+  background: #000;
+  padding: 12px;
+  margin-top: 6px;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 15px;
+  color: #00ff00;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: inset 0 0 8px rgba(0,255,0,0.15); 
+}
+
+#logContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+#logContent::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+
+#logContent::-webkit-scrollbar-thumb:hover {
+  background: #00aa00;
+}
+
+.body-no-scroll {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+.log-entry {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: transparent;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.log-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.log-body {
+  flex: 1;
+}
+
+.log-section {
+  margin-bottom: 8px;
+  color: var(--text-muted);
+}
+
+/* ================================
+   🧠 MODAL IA KEY
+================================ */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 10000;
+  transition: opacity 0.3s ease;
+  touch-action: none;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+  color: var(--text);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+  animation: fadeInUp 0.25s ease;
+}
+
+.modal-content h3 {
+  margin: 0 0 10px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.modal-content p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.modal-content input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.modal-content input[type="password"]:focus {
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.1);
+  outline: none;
+}
+
+.modal-content label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+.modal-content .actions {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  gap: 10px;
+}
+
+.modal-content .actions button {
+  flex: 1;
+  min-width: 95px;
+}
+
+.modal-content .cancel-wrapper {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.modal-content .cancel-wrapper button {
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 1rem;
+}
+
+.modal-content button:hover {
+  transform: translateY(-1px);
+}
+
+#saveAiKeyBtn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+
+#cancelAiKeyBtn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+#cancelAiKeyBtn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ================================
+   📖 DICIONÁRIO
+================================ */
+#dictionaryModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+#dictionaryModal .modal-content {
+  width: auto;
+  max-width: 440px;
+  background: linear-gradient(165deg, rgba(25,25,25,0.9), rgba(15,15,15,0.9));
+  border-radius: 18px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0px 8px 25px rgba(0,0,0,0.5);
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+#dictionaryModal .modal-content h3 {
+  text-align: center;
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+#dictionaryModal .modal-content p {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+}
+
+#dictionaryModal input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  transition: border-color .2s, background .2s;
+}
+
+#dictionaryModal input[type="text"]:focus {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--accent);
+  outline: none;
+}
+
+#dictionaryModal .btn-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#dictionaryModal button {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text);
+  font-size: 0.9rem;
+  transition: background .2s, transform .18s;
+}
+
+#dictionaryModal button:hover {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-1px);
+}
+
+#dictionaryModal button:active {
+  transform: scale(.95);
+}
+
+/* ======= DIÁLOGO MYMEMORY ======= */
+.mymemory-warning-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff4444;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    z-index: 9999;
+    animation: fadeWarning 0.25s ease-out;
+}
+
+@keyframes fadeWarning {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ======= BTN PREVIEW ======= */
+#inspectBtn {
+  width: auto;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--text);
+}
+
+#inspectBtn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+#inspectBtn svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--accent);
+}
+
+#inspectBtn:active {
+  opacity: .8;
+}
+
+/* ======= BARRA PRÉ-VISUALIZAÇÃO ======= */
+#previewHeader {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(
+      to bottom,
+      rgba(30, 34, 40, 0.95),
+      rgba(18, 20, 25, 0.92)
+  );
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--text);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    inset 0 -1px 2px rgba(255,255,255,0.06);
+}
+
+#previewHeader span {
+  opacity: 0.9;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+/* ======= "✕" PRÉ-VISUALIZAÇÃO ======= */
+#closePreviewBtn {
+  margin-right: -15px;
+  min-width: 40px;
+  max-width: 60px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid var(--border) none;
+  border-radius: 8px;
+  font-size: 20px;
+  color: var(--text);
+  transition: all 0.25s ease;
+}
+
+#closePreviewBtn:hover {
+  background: transparent;
+  transform: translateY(-2px);
+}
+
+#closePreviewBtn:active {
+  transform: scale(0.88);
+  background: transparent;
+}
+
+/* ======= PRÉ-VISUALIZAÇÃO ======= */
+#previewFrame {
+    width: 100%;
+    height: calc(100dvh - 90px) !important;
+    margin-top: 0px;
+    display: block;
+    border: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    animation: fadeInPreview 0.4s ease forwards;
+    opacity: 0;
+}
+
+#previewPanel {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  display: none;
+  z-index: 99999;
+  animation: fadePreview 0.25s ease;
+}
+
+@keyframes fadePreview {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInPreview {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ======= STRINGS.JSON======= */
+#exportStringsBtn {
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.0);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 15px;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+#exportStringsBtn svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--accent);
+}
+
+#exportStringsBtn:hover svg {
+}
+
+/* ======= STRING LIST ======= */
+#stringList {
+  transform: translateX(1%);
+  height: 280px;
+  width: 100%;
+  border-radius: 3%;
+  overflow-y: auto;
+  padding-right: 6px;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  
+}
+
+#stringList::-webkit-scrollbar {
+  width: 6px;
+}
+#stringList::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 6px;
+}
+
+input[type="text"]:focus {
+  scroll-margin-block: 40vh;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-bottom: 14px;
+}
+
+.item:hover {
+  background: rgba(255,255,255,0.05);
+  transform: scale(1.01);
+}
+
+.item input[type="text"] {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  max-width: calc(100% - 40px);
+  -webkit-overflow-scrolling: touch;
+  text-overflow: clip;
+  min-width: 0;
+  max-width: 100%;
+}
+ 
+.item input[type="text"].locked {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-muted);
+}
+
+.item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.item.locked {
+  opacity: 0.7;
+  background: rgba(255, 0, 0, 0.05);
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+input {
+    border: 1px solid #444;
+}
+
+input:focus {
+    outline: none;
+    border-color: red;
+    box-shadow: 0 0 0 2px rgba(0,170,255,0.3);
+}
+
+/* ======= RETRADUZIR ======= */
+
+.retryBtn {
+    flex: 0 0 auto;
+    border: none;
+    background: transparent;
+    cursor: none;
+}
+
+.retryBtn .icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* ======= BLOQUEIO (CADEADO) ======= */
+.lock-label {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 6px;
+    cursor: not-allowed;
+}
+
+.lock-label span {
+    font-size: 1rem;
+}
+
+/* ======= STRINGS ENCONTRADAS======= */
+.small {
+    font-size: 0.8em;
+    color
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.section-title {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* ======= BARRA DE SELEÇÃO ======= */
+#selectionSummary {
+	height: 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ================================
+   ⚙️ MEDIA QUERIES
+================================ */
+@media (max-width: 600px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .top-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  button, select, input[type="search"] {
+    flex: 1;
+  }
+
+  #logPanel {
+    max-height: 50vh;
+  }
+  }
