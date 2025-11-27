@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- Responsividade mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tradutor Pro+ - Modo Arquivo (Mobile Topbar)</title>
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/preview.css">
+</head>
+<body>
+<!-- Painel de pré-visualização do arquivo em tempo real-->
+<div id="previewPanel">
+    <div id="previewHeader">
+        <span>PRÉ-VISUALIZAÇÃO</span>
+        <button id="closePreviewBtn">✕</button>
+    </div>
+
+    <iframe id="previewFrame" src="about:blank"></iframe>
+</div>
+<!-- Topbar fixo -->
+<header class="topbar" role="banner">
+    <!-- Marca o indicador de porcentagem -->
+    <div class="brand">
+        <h1>Tradutor Pro+ (Arquivo/Strings)</h1>
+        <span id="headerProgress" class="header-progress" hidden>0%</span>
+    </div>
+
+    <!-- Ações do topo -->
+    <div class="top-actions" role="toolbar" aria-label="Ações principais">
+
+        <!-- Upload de arquivo -->
+        <div class="file-upload">
+            <label for="fileInput" class="file-btn">
+                <!-- Ícone -->
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 
+                    2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                </svg>
+                Escolher arquivo
+            </label>
+
+            <!-- Exibe o nome do arquivo -->
+            <span id="fileName" class="file-name">Nenhum arquivo selecionado</span>
+
+            <!-- Input real de upload -->
+            <input id="fileInput" type="file" accept=".html,.htm,.xml,.json" aria-label="Carregar arquivo">
+        </div>
+
+        <!-- Seletor de idioma -->
+        <select id="toLang" title="Idioma destino" aria-label="Idioma destino">
+        </select>
+
+        <!-- Botão traduzir -->
+        <button id="translateBtn">文 Traduzir</button>
+        
+        <!-- Baixar arquivo modificado -->
+<button id="downloadBtn" class="ghost" title="Baixar arquivo modificado">
+    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M5 20h14v-2H5v2zm7-18L5.33 
+        9h3.67v4h6V9h3.67L12 2z"/>
+    </svg>
+    Baixar
+</button>
+    </div>
+</header>
+
+<!-- Conteúdo principal da página -->
+<main class="page" role="main">
+
+    <!-- Instruções -->
+    <section class="card" aria-labelledby="instr">
+        <h2 id="instr">Modo: Tradução de arquivo (HTM, XML, JSON)</h2>
+        <p class="muted">
+            Carregue um arquivo - o sistema irá extrair strings
+            para você revisar e traduzir ou editar no resultado final.
+        </p>
+    </section>
+
+    <!-- Controles e ferramentas -->
+    <section class="card">
+        <div class="row">
+
+            <!-- Contador de strings -->
+            <div class="small muted">
+                Strings encontradas: <span class="section-title">0</span>
+            </div>
+
+            <!-- Botões de ações -->
+            <div class="controls">
+
+                <!-- Filtro -->
+                <input id="searchInput" type="search" placeholder="Filtrar strings..." class="small"/>
+
+                <!-- Marcação segura -->
+                <button id="autoSelectBtn" class="ghost" title="Marcação Segura">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 2a10 10 0 1 0 0 20 
+                        10 10 0 0 0 0-20zm-1 15l-5-5 
+                        1.41-1.41L11 13.17l6.59-6.59 
+                        L19 8l-8 9z"/>
+                    </svg>
+                    Marcação segura
+                </button>
+
+                <!-- Corrigir espaço ws...-->
+                <button id="fixSpacesBtn" class="ghost" title="Corrigir espaços">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M19 5l-7 7-7-7 
+                        1.41-1.41L12 9.17l5.59-5.58L19 5zm-7 
+                        7l7 7-1.41 1.41L12 15.83l-5.59 
+                        5.58L5 19l7-7z"/>
+                    </svg>
+                    Corrigir espaço
+                </button>
+
+                <!-- Painel de log -->
+                <button id="logToggleBtn" class="ghost" title="Abrir log">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 
+                        2v14c0 1.1.9 2 2 2h14c1.1 
+                        0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 
+                        16H5V5h14v14zM8 7h8v2H8V7zm0 
+                        4h8v2H8v-2zm0 4h5v2H8v-2z"/>
+                    </svg>
+                    Log
+                </button>
+
+                <!-- Chave IA -->
+                <button id="customKeyBtn" class="ghost" title="Usar chave de IA">
+                    🔑<br>Chave IA
+                </button>
+
+        <!-- Botão do dicionário -->
+        <button id="dictionaryBtn" class="ghost" title="Gerenciar dicionário">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 
+                0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 
+                0 0 1 1-1zm2 3v12h12V6H6zm2 
+                2h8v8H8V8z"/>
+            </svg>
+            Dicionário
+        </button>
+        
+        <!-- Botão aplicar dicionário -->
+<button id="applyDictionaryBtn" class="ghost" title="Aplicar correções do dicionário">
+    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M5 13l4 4L19 7l-1.41-1.41L9 14.17l-2.59-2.59L5 13z"/>
+    </svg>
+    Aplicar dicionário
+</button>
+
+        <!-- Botão abrir designer -->
+        <button id="inspectBtn" class="ghost" title="Abrir Designer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 
+                0 0 0-2 2v14a2 2 0 0 0 2 
+                2h14a2 2 0 0 0 2-2zM5 
+                5h14v8.59l-3.3-3.3a1 1 0 0 
+                0-1.4 0L10 15l-2.3-2.3a1 1 
+                0 0 0-1.4 0L5 14.59V5zm0 
+                14v-2.59l3-3 2.3 2.3a1 1 0 0 
+                0 1.4 0l4.3-4.3 3.3 3.3V19H5z 
+                M16.5 8a1.5 1.5 0 1 1 0-3 
+                1.5 1.5 0 0 1 0 3z"/>
+            </svg>
+            Preview
+        </button>
+        
+        <button id="exportStringsBtn" class="ghost">
+    <svg viewBox="0 0 24 24">
+        <path d="M4 4h16v12H4V4zm8 15l4-4h-3v-4h-2v4H8l4 4z"/>
+    </svg>Strings.json
+</button> 
+    </section>
+
+            </div>
+        </div>
+    <!-- Lista das strings extraídas -->
+    <section class="card container" aria-label="Strings extraídas">
+        <div id="stringList" aria-live="polite">
+            <div class="muted" style="padding:6px">
+                Nenhum arquivo carregado.
+            </div>
+        </div>
+    </section>
+
+<div id="logOverlay"></div>
+<div id="logPanel" hidden role="log">
+    <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+        <strong>Log da tradução</strong>
+        <div style="display:flex; gap:8px">
+            <button id="downloadLogBtn" class="ghost">Baixar</button>
+            <button id="closeLogBtn" class="ghost">Fechar</button>
+        </div>
+    </div>
+    <div id="logContent"></div>
+</div>
+
+    <!-- Textareas invisíveis usadas pelo script -->
+    <div style="display:none">
+        <textarea id="inputText"></textarea>
+        <textarea id="outputText"></textarea>
+    </div>
+</main>
+
+<!-- Tela de carregamento -->
+<div id="loadingScreen" aria-hidden="true">
+    <div id="loadingBox">
+        <div style="width:44px;height:44px;border-radius:50%;
+            border:4px solid rgba(255,255,255,0.06);
+            border-top-color:var(--accent);animation:spin 1s linear infinite">
+        </div>
+
+        <div id="loadingText" class="muted">Preparando...</div>
+
+        <button id="cancelTranslateBtn" class="ghost" style="margin-top:16px">
+            Minimizar
+        </button>
+    </div>
+</div>
+
+<!-- Modal – configuração da chave IA -->
+<div id="aiKeyModal" class="modal" style="display:none">
+    <div class="modal-content">
+    <h3>🔑 Chave de API OpenAI</h3>
+
+        <p class="muted">Insira sua chave secreta para habilitar a IA personalizada.</p>
+
+        <input type="password" id="aiKeyInput" placeholder="sk-xxxxxxxx">
+
+        <label for="aiModelSelect">Modelo de IA:</label>
+        <select id="aiModelSelect">
+            <option value="gpt-3.5-turbo">GPT-3.5-Turbo (rápido, barato)</option>
+            <option value="gpt-4o-mini">GPT-4o-Mini (equilibrado)</option>
+            <option value="gpt-4o">GPT-4o (preciso, caro)</option>
+            <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+        </select>
+
+        <label>
+            <input type="checkbox" id="saveAiKey"> Lembrar chave neste navegador
+        </label>
+
+        <div class="actions" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px">
+            <button id="saveAiKeyBtn" style="background:var(--accent);color:#fff;">✅ Ativar</button>
+            <button id="clearAiKeyBtn" style="background:#a82c2c;color:#fff;">Apagar chave</button>
+            <button id="createAccountBtn" style="background:#2c7da8;color:#fff;">🌐 Criar conta</button>
+            <button id="cancelAiKeyBtn" class="ghost">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Dicionário -->
+<div id="dictionaryModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Dicionário personalizado</h3>
+        <p class="muted">Adicionar, criar ou Importar traduções personalizadas.</p>
+
+        <input type="text" id="dictOriginal" placeholder="String original">
+        <input type="text" id="dictTranslated" placeholder="Tradução personalizada">
+
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <button id="dictSaveBtn">Salvar</button>
+            <button id="dictClearBtn" style="background:#a82c2c;color:white;">Excluir tudo</button>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+            <button id="dictExportBtn">Exportar</button>
+            <label>
+                <input type="file" id="dictImportFile" accept=".json" hidden>
+                <button id="dictImportBtn">Importar</button>
+            </label>
+        </div>
+
+        <div id="dictList" style="max-height:200px; overflow:auto; border:1px solid var(--border); padding:6px; border-radius:8px;"></div>
+
+        <div style="margin-top:12px; text-align:center;">
+            <button id="dictCloseBtn" class="ghost">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Script principal -->
+<script src="js/script.js"></script>
+<script src="js/preview.js"></script>
+
+</body>
+</html>
