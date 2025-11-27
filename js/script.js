@@ -62,8 +62,8 @@
 
 **BruMarti – YouTube**  
 https://youtube.com/@brumarti-oficial6117
- * ------------------------------------------------------------
- */
+ * ------------------------------------------------------------*/
+ 
 (function () {
   let userDictionary = JSON.parse(localStorage.getItem("userDictionary")) || {};
   function saveUserDictionary() {
@@ -385,18 +385,70 @@ function applyUserDictionary(text) {
 
     let working = text.replace(/\u00A0/g, " ");
 
+    //Ordena por tamanho da chave (literal)
     const entries = Object.entries(userDictionary)
         .sort((a, b) => b[0].length - a[0].length);
 
-    for (const [original, translated] of entries) {
-        if (!original || !translated) continue;
+    for (const [key, value] of entries) {
+
+        //Caso 1 → formato antigo
+        if (typeof value === "string") {
+            applyLiteralReplace(key, value);
+            continue;
+        }
+
+        // Caso 2 → formato novo
+        if (typeof value === "object" && value !== null) {
+            const dictEntry = value;
+
+            const original   = dictEntry.original   ?? key;
+            const translated = dictEntry.translated ?? "";
+            const attrName   = dictEntry.attrName   ?? null;
+            const isRegex    = !!dictEntry.regex;
+
+            //Se houver attrName, só aplicar se aparecer no HTML
+            if (attrName) {
+                //
+                const attrCheck1 = new RegExp(`${attrName}\\s*=`, "i");
+                const attrCheck2 = new RegExp(`${attrName}\\s*\\(`, "i");
+
+                if (!attrCheck1.test(working) && !attrCheck2.test(working)) {
+                    continue; //Atributo não associado → ignora
+                }
+            }
+
+            //REGEX
+            if (isRegex) {
+                try {
+                    const rx = new RegExp(original, "gi");
+                    working = working.replace(rx, translated);
+                } catch (err) {
+                    console.warn("Regex inválido no dicionário:", original);
+                }
+                continue;
+            }
+
+            //Literal com metadados
+            applyLiteralReplace(original, translated);
+            continue;
+        }
+    }
+
+    return working;
+    
+    // ====================================================
+    // Função auxiliar antiga
+    // ====================================================
+    function applyLiteralReplace(original, translated) {
+        if (!original || !translated) return;
 
         const cleanOriginal = original
             .replace(/\u00A0/g, " ")
             .replace(/\s+/g, " ")
             .trim();
-        const cleanTranslated = translated;
+
         const escaped = cleanOriginal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
         const pattern = new RegExp(
             "(?<=^|[\\s.,!?;:\"'’”»()\\[\\]])" +
             escaped.replace(/\s+/g, "\\s+") +
@@ -405,14 +457,13 @@ function applyUserDictionary(text) {
         );
 
         working = working.replace(pattern, (match) => {
+            //Mantém capitalização
             if (match[0] === match[0].toUpperCase()) {
-                return cleanTranslated.charAt(0).toUpperCase() + cleanTranslated.slice(1);
+                return translated.charAt(0).toUpperCase() + translated.slice(1);
             }
-            return cleanTranslated;
+            return translated;
         });
     }
-
-    return working;
 }
 
   function showLoading(txt = 'Carregando...') {
@@ -1254,31 +1305,69 @@ return;
       }
     });
     exportBtn.addEventListener("click", () => {
-      const blob = new Blob([JSON.stringify(userDictionary, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "dicionario.json";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
+
+  //Converte o formato antigo { "Back":"Voltar" } para array []
+  const formatted = Object.entries(userDictionary).map(([orig, trans], index) => ({
+    original: orig,
+    translated: trans,
+    type: "text",
+    index,
+    attrName: null,
+    rawInner: null
+  }));
+
+  const blob = new Blob(
+    [JSON.stringify(formatted, null, 2)],
+    { type: "application/json" }
+  );
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "dicionario.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
     importBtn.addEventListener("click", () => importFile.click());
-    importFile.addEventListener("change", e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        try {
-          const data = JSON.parse(ev.target.result);
-          userDictionary = { ...userDictionary, ...data };
-          saveUserDictionary();
-          updateDictList();
-          showToast("Dicionário importado com sucesso!");
-        } catch {
-          alert("Erro ao importar o dicionário.");
-        }
-      };
-      reader.readAsText(file);
-    });
+importFile.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+
+      //NOVO FORMATO → array de objetos
+      if (Array.isArray(data)) {
+        data.forEach(entry => {
+          if (entry && entry.original && entry.translated) {
+            userDictionary[entry.original] = entry.translated;
+          }
+        });
+      }
+
+      //FORMATO ANTIGO → objeto simples
+      else if (typeof data === "object") {
+        userDictionary = { ...userDictionary, ...data };
+      }
+
+      else {
+        throw new Error("Formato desconhecido");
+      }
+
+      saveUserDictionary();
+      updateDictList();
+      showToast("✔️ Dicionário importado com sucesso!");
+
+    } catch (err) {
+      console.error("Import error:", err);
+      alert("Erro ao importar o dicionário. Formato inválido.");
+    }
+  };
+
+  reader.readAsText(file);
+});
 
     updateDictList();
   });
@@ -1398,12 +1487,20 @@ exportBtn?.addEventListener("click", () => {
         return;
     }
 
-    const result = {};
+    //Exporta novo formato
+    const result = [];
 
     items.forEach((input, index) => {
-        const key = input.dataset.original?.trim() || `string_${index}`;
-        const value = input.value.trim();
-        result[key] = value;
+
+        result.push({
+            original: input.dataset.original || "",
+            translated: input.value || "",
+            type: input.dataset.type || "text",
+            index: Number(input.dataset.index ?? index),
+            attrName: input.dataset.attrName || null,
+            jsonPath: input.dataset.jsonPath ? JSON.parse(input.dataset.jsonPath) : null,
+            rawInner: input.dataset.rawInner || null
+        });
     });
 
     const blob = new Blob(
