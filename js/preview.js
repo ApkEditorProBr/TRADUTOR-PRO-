@@ -95,27 +95,28 @@ https://youtube.com/@brumarti-oficial6117
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  function replaceSmart(html, original, edited) {
-    const normOriginal = original.replace(/\u00A0/g, " ").replace(/\s+/g, " ").trim();
-    const safe = escapeRegex(normOriginal);
+function replaceSmart(html, original, edited) {
+  if (!original.trim()) return html;
 
-    const flexSpaces = "[ \\u00A0]+";
-    const flexibleSafe = safe.replace(/\\ /g, flexSpaces);
+  // normalizar espaços
+  const normOriginal = original.replace(/\u00A0/g, " ").replace(/\s+/g, " ").trim();
 
-    const boundaryRegex = new RegExp(`(?<!\\w)${flexibleSafe}(?!\\w)`, "gi");
+  // proteger regex
+  const esc = normOriginal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-    let replaced = false;
-    html = html.replace(boundaryRegex, match => {
-      replaced = true;
-      return edited;
-    });
+  // match APENAS quando não houver letras/números antes/depois
+  const regex = new RegExp(`(?<![\\w\\-])${esc}(?![\\w\\-])`, "gi");
 
-    if (replaced) return html;
+  let replaced = html.replace(regex, edited);
 
-    const fallbackRegex = new RegExp(flexibleSafe, "gi");
-
-    return html.replace(fallbackRegex, edited);
+  // fallback para casos extremos
+  if (replaced === html) {
+    const fallback = new RegExp(esc, "gi");
+    return html.replace(fallback, edited);
   }
+
+  return replaced;
+}
 
   function syntaxHighlightHTML(html) {
     return html
@@ -272,14 +273,11 @@ function syntaxHighlightXML(xml) {
     let content = originalFileContent;
 
     const inputs = stringList.querySelectorAll("input[type='text']");
-    inputs.forEach(input => {
-      const original = (input.dataset.original || "").trim();
-      const edited = input.value.trim();
-      if (!original || !edited) return;
-
-      const esc = original.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      content = content.replace(new RegExp(esc, "g"), edited);
-    });
+inputs.forEach(input => {
+  const original = input.dataset.original || "";
+  const edited = input.value || "";
+  content = replaceSmart(content, original, edited);
+});
 
     //JSON
     if (isJSON) {
