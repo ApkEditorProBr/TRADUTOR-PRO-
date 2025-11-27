@@ -156,3 +156,5 @@ O preview impede qualquer execução de scripts:
 ---
 
 link: https://apkeditorprobr.github.io/TRADUTOR-PRO-/
+
+Baixar repositório: https://github.com/ApkEditorProBr/TRADUTOR-PRO-/archive/refs/heads/main.zip
