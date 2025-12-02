@@ -1503,8 +1503,21 @@ exportBtn?.addEventListener("click", () => {
         });
     });
 
+    //REMOVE DUPLICAÇÕES mantém apenas o primeiro de cada "original"
+    const unique = [];
+    const seen = new Set();
+
+    for (const row of result) {
+        const key = row.original.trim(); //Chave para detectar duplicados
+        if (!seen.has(key)) {
+            seen.add(key);
+            unique.push(row);
+        }
+    }
+
+    //Exporta o JSON sem duplicações
     const blob = new Blob(
-        [JSON.stringify(result, null, 2)],
+        [JSON.stringify(unique, null, 2)],
         { type: "application/json" }
     );
 
